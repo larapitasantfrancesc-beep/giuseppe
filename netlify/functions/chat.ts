@@ -33,15 +33,15 @@ const handler: Handler = async (event: HandlerEvent) => {
     ];
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          systemInstruction: {
-            parts: [{
-              text: `You are Giuseppe, the official virtual assistant for Pizzeria La Ràpita. Your role is to be a friendly, Mediterranean digital waiter.
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`,
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents,
+      systemInstruction: {
+        parts: [{
+          text: `You are Giuseppe, the official virtual assistant for Pizzeria La Ràpita. Your role is to be a friendly, Mediterranean digital waiter.
 
 IMPORTANT RULES:
 1. Language: Default Catalan, adapt to user's language (Catalan/Spanish/English/Italian)
@@ -62,17 +62,17 @@ Pizza Menu (selected):
 - RÚCULA €13.70, Cherry €14.70, Vegetariana €11.20
 
 Ice Creams: Gelateria Lumalú 300g tubs (8 flavors)`
-            }],
-          },
-          generationConfig: {
-            temperature: 0.9,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192,
-          },
-        }),
-      }
-    );
+        }],
+      },
+      generationConfig: {
+        temperature: 0.9,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      },
+    }),
+  }
+);
 
     if (!response.ok) {
       console.error('Gemini API error:', await response.text());
