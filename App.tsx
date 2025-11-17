@@ -24,8 +24,8 @@ const App: React.FC = () => {
 
   const initializeChat = useCallback(() => {
     try {
-      const apiKey = process.env.API_KEY;
-      if (!apiKey) {
+      const API_KEY = process.env.API_KEY;
+      if (!API_KEY) {
         throw new Error("API_KEY environment variable not set. Please set it in your Netlify site settings.");
       }
       const ai = new GoogleGenAI({ apiKey });
