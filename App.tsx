@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { ChatMessage as ChatMessageType } from './types';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
-import { BotIcon } from './components/icons/BotIcon';
+import { BotIcon } from './components/icons/BotIcon'; 
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageType[]>([
