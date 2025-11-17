@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GoogleGenAI, Chat } from '@google/genai';
-import { SYSTEM_INSTRUCTION } from './constants';
+import React, { useState, useEffect, useRef } from 'react';
 import type { ChatMessage as ChatMessageType } from './types';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { BotIcon } from './components/icons/BotIcon';
 
 const App: React.FC = () => {
-  const [chat, setChat] = useState<Chat | null>(null);
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([
+    {
+      role: 'model',
+      parts: [{ text: "Hola! Sóc en Giuseppe, preparat per ajudar-te amb la teva pizza. Vols una recomanació o vols saber quina promoció tenim avui? Bon profit!" }],
+      id: Date.now().toString(),
+    },
+  ]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,40 +25,8 @@ const App: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const initializeChat = useCallback(() => {
-    try {
-      const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!API_KEY) {
-        throw new Error("VITE_GEMINI_API_KEY environment variable not set. Please set it in your Netlify site settings.");
-      }
-      const ai = new GoogleGenAI({ API_KEY });
-      const newChat = ai.chats.create({
-        model: 'gemini-2.5-flash',
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-        },
-      });
-      setChat(newChat);
-      setMessages([
-        {
-          role: 'model',
-          parts: [{ text: "Hola! Sóc en Giuseppe, preparat per ajudar-te amb la teva pizza. Vols una recomanació o vols saber quina promoció tenim avui? Bon profit!" }],
-          id: Date.now().toString(),
-        },
-      ]);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "An unknown error occurred during initialization.");
-      console.error(e);
-    }
-  }, []);
-
-  useEffect(() => {
-    initializeChat();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleSendMessage = async () => {
-    if (!userInput.trim() || isLoading || !chat) return;
+    if (!userInput.trim() || isLoading) return;
 
     setIsLoading(true);
     setError(null);
@@ -70,27 +41,30 @@ const App: React.FC = () => {
     setUserInput('');
 
     try {
-      const stream = await chat.sendMessageStream({ message: userInput });
+      const history = messages.map(msg => ({
+        role: msg.role === 'model' ? 'model' : 'user',
+        parts: msg.parts,
+      }));
 
-      let newBotMessage: ChatMessageType = {
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userInput, history }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const botMessage: ChatMessageType = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        parts: [{ text: "" }],
+        parts: [{ text: data.response }],
       };
-      setMessages(prev => [...prev, newBotMessage]);
-
-      for await (const chunk of stream) {
-        const chunkText = chunk.text;
-        if (chunkText) {
-          setMessages(prevMessages => {
-            return prevMessages.map(msg =>
-              msg.id === newBotMessage.id
-                ? { ...msg, parts: [{ text: msg.parts[0].text + chunkText }] }
-                : msg
-            );
-          });
-        }
-      }
+      
+      setMessages(prev => [...prev, botMessage]);
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
       setError(`Error sending message: ${errorMessage}`);
@@ -121,7 +95,7 @@ const App: React.FC = () => {
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
         ))}
-        {isLoading && messages[messages.length-1].role === 'user' && (
+        {isLoading && (
            <div className="flex justify-start items-end space-x-3">
              <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white flex-shrink-0">
                <BotIcon />
