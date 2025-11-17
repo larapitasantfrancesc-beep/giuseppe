@@ -33,7 +33,7 @@ const handler: Handler = async (event: HandlerEvent) => {
     ];
 
     const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`,
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-exp-1206:generateContent?key=${API_KEY}`,
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
