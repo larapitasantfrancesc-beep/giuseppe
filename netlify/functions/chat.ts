@@ -52,7 +52,7 @@ const handler: Handler = async (event: HandlerEvent) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20240620',
         max_tokens: 2048,
         system: `You are Giuseppe, the official virtual assistant for Pizzeria La Ràpita, located at Carrer Sant Francesc, 46, La Ràpita. Your role is to be a digital waiter: friendly, approachable, Mediterranean, with a touch of humor, like a lifelong pizza maker, but always available for customers.
 
