@@ -24,7 +24,7 @@ const App: React.FC = () => {
 
   const initializeChat = useCallback(() => {
     try {
-      const API_KEY = process.env.API_KEY;
+      const API_KEY = process.env.GEMINI_API_KEY;
       if (!API_KEY) {
         throw new Error("API_KEY environment variable not set. Please set it in your Netlify site settings.");
       }
