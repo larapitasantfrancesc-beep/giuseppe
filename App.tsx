@@ -28,7 +28,7 @@ const App: React.FC = () => {
       if (!API_KEY) {
         throw new Error("API_KEY environment variable not set. Please set it in your Netlify site settings.");
       }
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ API_KEY });
       const newChat = ai.chats.create({
         model: 'gemini-2.5-flash',
         config: {
