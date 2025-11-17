@@ -26,7 +26,7 @@ const App: React.FC = () => {
     try {
       const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
       if (!API_KEY) {
-        throw new Error("API_KEY environment variable not set. Please set it in your Netlify site settings.");
+        throw new Error("VITE_GEMINI_API_KEY environment variable not set. Please set it in your Netlify site settings.");
       }
       const ai = new GoogleGenAI({ API_KEY });
       const newChat = ai.chats.create({
